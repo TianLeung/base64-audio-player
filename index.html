@@ -13,20 +13,6 @@
       position: relative;
       overflow-x: hidden;
     }
-    .signature-bg {
-      position: fixed;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%) rotate(-10deg);
-      font-family: 'Zhi Mang Xing', cursive;
-      font-size: 120px;
-      color: rgba(80,180,255,0.08);
-      pointer-events: none;
-      user-select: none;
-      z-index: 0;
-      white-space: nowrap;
-      text-shadow: 0 0 40px #4f8cff, 0 0 80px #fff;
-    }
     .container {
       max-width: 650px;
       margin: 60px auto 40px auto;
@@ -36,7 +22,19 @@
       padding: 38px 36px 28px 36px;
       position: relative;
       z-index: 1;
-      border: 1.5px solid #4f8cff;
+      /* 动态跑马灯边框 */
+      border: 3px solid;
+      border-image: linear-gradient(270deg, #4f8cff, #00e0ff, #4f8cff, #00e0ff, #4f8cff) 1;
+      animation: borderMove 4s linear infinite;
+      border-width: 3px;
+    }
+    @keyframes borderMove {
+      0% {
+        border-image-source: linear-gradient(270deg, #4f8cff, #00e0ff, #4f8cff, #00e0ff, #4f8cff);
+      }
+      100% {
+        border-image-source: linear-gradient(630deg, #00e0ff, #4f8cff, #00e0ff, #4f8cff, #00e0ff);
+      }
     }
     h2 {
       text-align: center;
@@ -119,15 +117,34 @@
     }
     .info-label { font-weight: 700; }
     .info-value { font-family: monospace; color: #00e0ff; }
+    /* 新增签名样式 */
+    .signature-bottom {
+      width: 100vw;
+      text-align: center;
+      position: fixed;
+      left: 0;
+      bottom: 32px;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .signature-bottom-inner {
+      display: inline-block;
+      font-family: 'Zhi Mang Xing', cursive;
+      font-size: 70px;
+      color: rgba(80,180,255,0.13);
+      text-shadow: 0 0 40px #4f8cff, 0 0 80px #fff;
+      letter-spacing: 6px;
+      user-select: none;
+      pointer-events: none;
+    }
     @media (max-width: 700px) {
       .container { padding: 12px 4vw; }
       .lang-btn { right: 10px; top: 10px; }
-      .signature-bg { font-size: 60px; }
+      .signature-bottom-inner { font-size: 36px; }
     }
   </style>
 </head>
 <body>
-  <div class="signature-bg">TianLeung</div>
   <button class="lang-btn" id="langBtn" onclick="toggleLang()">English</button>
   <div class="container">
     <h2 id="title">Base64 音频播放器</h2>
@@ -151,9 +168,10 @@
       </a>
     </div>
     <div class="footer" id="footer">
-      © 2024 Base64 音频播放器 | <a href="https://github.com/TianLeung/base64-audio-player" target="_blank">GitHub</a>
+      © 2025 Base64 音频播放器 | <a href="https://github.com/TianLeung/base64-audio-player" target="_blank">GitHub</a>
     </div>
   </div>
+  <div class="signature-bottom"><span class="signature-bottom-inner">TianLeung</span></div>
   <script>
     // 多语言文本
     const langText = {
@@ -165,7 +183,7 @@
         pause: "暂停",
         alert: "请粘贴base64音频内容！",
         download: "下载",
-        footer: "© 2024 Base64 音频播放器 | ",
+        footer: "© 2025 Base64 音频播放器 | ",
         langBtn: "English",
         wechat: "微信:",
         mp: "公众号:"
@@ -178,7 +196,7 @@
         pause: "Pause",
         alert: "Please paste base64 audio content!",
         download: "Download",
-        footer: "© 2024 Base64 Audio Player | ",
+        footer: "© 2025 Base64 Audio Player | ",
         langBtn: "中文",
         wechat: "WeChat:",
         mp: "Official Account:"
