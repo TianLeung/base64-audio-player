@@ -17,14 +17,17 @@
     .time { font-size: 13px; color: #666; min-width: 60px; text-align: right; }
     .download-link { margin-left: 10px; }
     .footer { text-align: center; color: #aaa; font-size: 13px; margin-top: 24px; }
+    .lang-btn { position: absolute; right: 30px; top: 30px; background: #eee; color: #333; border: none; border-radius: 6px; padding: 6px 14px; font-size: 14px; cursor: pointer; }
+    .lang-btn:hover { background: #dbeafe; }
   </style>
 </head>
 <body>
+  <button class="lang-btn" id="langBtn" onclick="toggleLang()">English</button>
   <div class="container">
-    <h2>Base64 音频播放器</h2>
+    <h2 id="title">Base64 音频播放器</h2>
     <textarea id="b64" placeholder="粘贴你的base64音频内容（只需内容，不要加data:audio/mp3;base64,）"></textarea>
     <div class="controls">
-      <button class="btn" onclick="loadAudio()">
+      <button class="btn" id="loadBtn" onclick="loadAudio()">
         <img class="icon" src="https://img.icons8.com/ios-filled/50/ffffff/play--v1.png"/> 加载音频
       </button>
       <audio id="audio" style="display:none"></audio>
@@ -37,11 +40,54 @@
         <img class="icon" src="https://img.icons8.com/ios-filled/50/4f8cff/download--v1.png"/>
       </a>
     </div>
-    <div class="footer">
+    <div class="footer" id="footer">
       © 2024 Base64 音频播放器 | <a href="https://github.com/TianLeung/base64-audio-player" target="_blank">GitHub</a>
     </div>
   </div>
   <script>
+    // 多语言文本
+    const langText = {
+      zh: {
+        title: "Base64 音频播放器",
+        placeholder: "粘贴你的base64音频内容（只需内容，不要加data:audio/mp3;base64,）",
+        load: "加载音频",
+        play: "播放",
+        pause: "暂停",
+        alert: "请粘贴base64音频内容！",
+        download: "下载",
+        footer: "© 2024 Base64 音频播放器 | ",
+        langBtn: "English"
+      },
+      en: {
+        title: "Base64 Audio Player",
+        placeholder: "Paste your base64 audio content (just the content, no data:audio/mp3;base64,)",
+        load: "Load Audio",
+        play: "Play",
+        pause: "Pause",
+        alert: "Please paste base64 audio content!",
+        download: "Download",
+        footer: "© 2024 Base64 Audio Player | ",
+        langBtn: "中文"
+      }
+    };
+    let currentLang = "zh";
+
+    function setLang(lang) {
+      currentLang = lang;
+      document.getElementById('title').textContent = langText[lang].title;
+      document.getElementById('b64').placeholder = langText[lang].placeholder;
+      document.getElementById('loadBtn').innerHTML = `<img class="icon" src="https://img.icons8.com/ios-filled/50/ffffff/play--v1.png"/> ${langText[lang].load}`;
+      document.getElementById('footer').innerHTML = langText[lang].footer + `<a href="https://github.com/TianLeung/base64-audio-player" target="_blank">GitHub</a>`;
+      document.getElementById('langBtn').textContent = langText[lang].langBtn;
+      // 下载按钮的title
+      document.getElementById('download').title = langText[lang].download;
+    }
+
+    function toggleLang() {
+      setLang(currentLang === "zh" ? "en" : "zh");
+    }
+
+    // 音频相关
     const audio = document.getElementById('audio');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const playPauseIcon = document.getElementById('playPauseIcon');
@@ -52,7 +98,7 @@
     function loadAudio() {
       let b64 = document.getElementById('b64').value.trim();
       if (!b64) {
-        alert('请粘贴base64音频内容！');
+        alert(langText[currentLang].alert);
         return;
       }
       let dataUrl = 'data:audio/mp3;base64,' + b64;
@@ -74,9 +120,11 @@
 
     audio.addEventListener('play', () => {
       playPauseIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/pause--v1.png";
+      playPauseBtn.title = langText[currentLang].pause;
     });
     audio.addEventListener('pause', () => {
       playPauseIcon.src = "https://img.icons8.com/ios-filled/50/ffffff/play--v1.png";
+      playPauseBtn.title = langText[currentLang].play;
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -98,6 +146,9 @@
       let s = sec % 60;
       return (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
     }
+
+    // 初始化为中文
+    setLang("zh");
   </script>
 </body>
 </html>
