@@ -5,14 +5,42 @@
   <title>Base64 音频播放器</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Zhi+Mang+Xing&display=swap');
-    body {
-      font-family: 'Segoe UI', Arial, sans-serif;
-      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+    
+    /* === 新增样式 === */
+    html, body {
       margin: 0; padding: 0;
       min-height: 100vh;
+      transition: background 0.8s;
+    }
+    body.light {
+      background: #ffffff;
+    }
+    body.dark {
+      background: #111111;
+    }
+    #toggleTheme {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: none;
+      border: none;
+      font-size: 1.8rem;
+      cursor: pointer;
+      z-index: 100;
+      transition: transform 0.3s ease;
+    }
+    #toggleTheme:hover {
+      transform: scale(1.2);
+    }
+    /* === 修改原有样式 === */
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      /* background: linear-gradient(135deg, #232526 0%, #414345 100%);  <-- 已移除此行 */
       position: relative;
       overflow-x: hidden;
     }
+
+    /* === 以下为原有样式，保持不变 === */
     .container {
       max-width: 650px;
       margin: 60px auto 40px auto;
@@ -22,7 +50,6 @@
       padding: 38px 36px 28px 36px;
       position: relative;
       z-index: 1;
-      /* 动态跑马灯边框 */
       border: 3px solid;
       border-image: linear-gradient(270deg, #4f8cff, #00e0ff, #4f8cff, #00e0ff, #4f8cff) 1;
       animation: borderMove 4s linear infinite;
@@ -117,7 +144,6 @@
     }
     .info-label { font-weight: 700; }
     .info-value { font-family: monospace; color: #00e0ff; }
-    /* 新增签名样式 */
     .signature-bottom {
       width: 100vw;
       text-align: center;
@@ -172,8 +198,11 @@
     </div>
   </div>
   <div class="signature-bottom"><span class="signature-bottom-inner">TianLeung</span></div>
+  
+  <button id="toggleTheme" title="切换白/夜模式">🌙</button>
+
   <script>
-    // 多语言文本
+    // === 原有音频播放器和语言切换脚本 ===
     const langText = {
       zh: {
         title: "Base64 音频播放器",
@@ -212,7 +241,6 @@
       document.getElementById('footer').innerHTML = langText[lang].footer + `<a href="https://github.com/TianLeung/base64-audio-player" target="_blank">GitHub</a>`;
       document.getElementById('langBtn').textContent = langText[lang].langBtn;
       document.getElementById('download').title = langText[lang].download;
-      // 微信和公众号
       document.querySelector('.info-box .info-label:nth-child(1)').textContent = langText[lang].wechat;
       document.querySelector('.info-box .info-label:nth-child(3)').textContent = langText[lang].mp;
     }
@@ -221,7 +249,6 @@
       setLang(currentLang === "zh" ? "en" : "zh");
     }
 
-    // 音频相关
     const audio = document.getElementById('audio');
     const playPauseBtn = document.getElementById('playPauseBtn');
     const playPauseIcon = document.getElementById('playPauseIcon');
@@ -283,6 +310,54 @@
 
     // 初始化为中文
     setLang("zh");
+
+    // === 新增的 Canvas 动态背景和主题切换脚本 ===
+    let nestScript;
+    const body = document.body;
+    const themeToggle = document.getElementById('toggleTheme');
+
+    const getCurrentTheme = () => {
+      return localStorage.getItem('theme') ||
+             (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    };
+
+    const applyTheme = (theme) => {
+      body.classList.remove('light', 'dark');
+      body.classList.add(theme);
+      themeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
+      localStorage.setItem('theme', theme);
+      loadCanvasNest(theme);
+    };
+
+    const loadCanvasNest = (theme) => {
+      // 移除旧的 canvas-nest 脚本和 canvas 元素
+      if (nestScript) nestScript.remove();
+      const oldCanvas = document.querySelector('canvas');
+      if (oldCanvas) oldCanvas.remove();
+
+      nestScript = document.createElement('script');
+      nestScript.src = "https://cdn.jsdelivr.net/npm/canvas-nest.js@2.0.4/dist/canvas-nest.min.js";
+      nestScript.onload = () => {
+        new CanvasNest(document.body, {
+          color: theme === 'dark' ? '255,255,255' : '0,0,0',
+          opacity: 0.6,
+          count: 193,
+          zIndex: -2,
+          distance: 140,
+          followMouse: true
+        });
+      };
+      document.body.appendChild(nestScript);
+    };
+
+    // 初始化主题
+    applyTheme(getCurrentTheme());
+
+    // 切换按钮事件
+    themeToggle.addEventListener('click', () => {
+      const newTheme = body.classList.contains('dark') ? 'light' : 'dark';
+      applyTheme(newTheme);
+    });
   </script>
 </body>
 </html>
